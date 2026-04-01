@@ -58,19 +58,15 @@ def run_volume_alert():
                 print(f"  [{ticker}] 數據不足，跳過")
                 continue
 
-            # 確保欄位名稱正確
             df.columns = [c[0] if isinstance(c, tuple) else c for c in df.columns]
             df = df.dropna(subset=["Volume", "Close"])
 
-            # 取最後一筆作為「今日」
             today_vol   = float(df["Volume"].iloc[-1])
             today_close = float(df["Close"].iloc[-1])
 
-            # 前一日收盤（計算漲跌）
             prev_close  = float(df["Close"].iloc[-2]) if len(df) >= 2 else today_close
             pct_chg     = (today_close - prev_close) / prev_close * 100 if prev_close else 0
 
-            # 20日均量（不含今日）
             ma_vol = float(df["Volume"].iloc[-MA_WINDOW-1:-1].mean())
 
             ratio  = today_vol / ma_vol if ma_vol > 0 else 0
